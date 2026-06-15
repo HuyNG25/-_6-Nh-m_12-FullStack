@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  project-member-service:
+    build:
+      context: ./ProjectMemberService
+      dockerfile: Dockerfile
+    container_name: project-member-service
+    ports:
+      - "5100:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Jwt__Key=SuperSecretKey_ProjectMemberService_2024_DoNotShare!
+      - Jwt__Issuer=ProjectMemberService
+      - Jwt__Audience=ProjectMemberServiceClient
+    restart: unless-stopped
+    networks:
+      - project-network
+
+networks:
+  project-network:
+    driver: bridge
