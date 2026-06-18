@@ -57,7 +57,7 @@ namespace ProjectMemberService.Services
             return ApiResponse<ProjectResponseDto>.Ok(MapToResponse(project), "Tạo dự án thành công");
         }
 
-        public async Task<ApiResponse<List<ProjectResponseDto>>> GetAllAsync(string? userId = null)
+        public async Task<ApiResponse<List<ProjectResponseDto>>> GetAllAsync(string? userId = null, bool myProjectsOnly = false)
         {
             var query = _context.Projects
                 .Include(p => p.Members)
@@ -66,10 +66,19 @@ namespace ProjectMemberService.Services
 
             if (!string.IsNullOrEmpty(userId))
             {
-                var isSystemAdmin = await _permissionService.IsSystemAdminAsync(userId);
-                if (!isSystemAdmin)
+                if (myProjectsOnly)
                 {
+                    // Nếu user chỉ muốn lấy dự án của họ (tab "Dự án của tôi")
                     query = query.Where(p => p.Members.Any(m => m.UserId == userId));
+                }
+                else
+                {
+                    // Nếu lấy tất cả, System Admin được xem hết, người khác chỉ xem dự án của mình
+                    var isSystemAdmin = await _permissionService.IsSystemAdminAsync(userId);
+                    if (!isSystemAdmin)
+                    {
+                        query = query.Where(p => p.Members.Any(m => m.UserId == userId));
+                    }
                 }
             }
 

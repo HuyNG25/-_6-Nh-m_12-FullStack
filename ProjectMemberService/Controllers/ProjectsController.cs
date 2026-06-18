@@ -51,7 +51,7 @@ namespace ProjectMemberService.Controllers
         public async Task<IActionResult> GetAll([FromQuery] bool myProjects = false)
         {
             var userId = GetUserId();
-            var result = await _projectService.GetAllAsync(userId);
+            var result = await _projectService.GetAllAsync(userId, myProjects);
             return Ok(result);
         }
 
